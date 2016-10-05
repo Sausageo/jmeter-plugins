@@ -404,6 +404,19 @@ public class HttpSimpleTableServer extends NanoHTTPD implements Stoppable, KeyWa
     }
 
     public static void main(String args[]) {
+    	boolean waitForKeyBool = true;
+    	if(args.length==1){
+    		if(args[0].equalsIgnoreCase("false") || args[0].equalsIgnoreCase("f")){
+    			waitForKeyBool = false;
+    		}
+    		else if(args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("t")){
+    			waitForKeyBool = true;
+    		}
+    		else{
+    			log.info("Invalid use of parameter. Leave blank or set \"true\" for default use, tying up input stream.");
+    			log.info("Set to \"false\" to run in background, ignoring input.");
+    		}
+    	}
         JMeterUtils.loadJMeterProperties("jmeter.properties");
         String dataset = JMeterUtils.getPropDefault(
                 "jmeterPlugin.sts.datasetDirectory",
@@ -429,15 +442,18 @@ public class HttpSimpleTableServer extends NanoHTTPD implements Stoppable, KeyWa
         log.info("TIMESTAMP : " + timestamp);
         log.info("------------------------------");
         log.info("STS_VERSION : " + STS_VERSION);
-        ServerRunner.executeInstance(serv);
+        
+        ServerRunner.executeInstance(serv, waitForKeyBool);
     }
 
     public void waitForKey() {
         log.info("Hit Enter to stop");
         try {
-
+        	
             System.in.read();
-        } catch (Throwable ignored) {
+        } catch (Exception e) {
+        	System.out.println(e.getMessage());
         }
     }
+    
 }

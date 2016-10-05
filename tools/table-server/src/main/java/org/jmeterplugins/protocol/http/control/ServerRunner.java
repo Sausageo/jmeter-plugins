@@ -34,6 +34,34 @@ public class ServerRunner {
         }
     }
 
+    public static void executeInstance(NanoHTTPD server, boolean waitForKeyBool) {
+        if (null != server) {
+            try {
+                server.start();
+            } catch (IOException ioe) {
+                System.err.println("Couldn't start server:" + ioe);
+                return;
+            }
+            log.info("Server started");
+
+            if(waitForKeyBool){
+	            if (server instanceof KeyWaiter) {
+	                ((KeyWaiter) server).waitForKey();
+	            }
+            }
+
+            else{
+            	log.info("Send request to server http://hostname:" + server.getListeningPort() + "/sts/STOP to stop");
+            	while(!server.myServerSocket.isClosed() && server.isAlive() && server.getListeningPort()!=-1);
+            }
+            
+            if (server.isAlive()) {
+                server.stop();
+            }
+        }
+        log.info("Server stopped.");
+    }
+    
     public static void executeInstance(NanoHTTPD server) {
         if (null != server) {
             try {
@@ -47,7 +75,7 @@ public class ServerRunner {
             if (server instanceof KeyWaiter) {
                 ((KeyWaiter) server).waitForKey();
             }
-
+            
             if (server.isAlive()) {
                 server.stop();
             }
