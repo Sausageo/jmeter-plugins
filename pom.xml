@@ -7,10 +7,10 @@
     <version>2.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>infra</module>
-        <module>plugins</module>
+        <!-- <module>infra</module> -->
+        <!-- <module>plugins</module> -->
         <module>tools</module>
-        <module>graphs</module>
+        <!-- <module>graphs</module> -->
     </modules>
 
 </project>

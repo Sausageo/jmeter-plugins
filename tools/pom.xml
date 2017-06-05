@@ -28,13 +28,13 @@
 
     <modules>
         <module>cmd</module>
-        <module>filterresults</module>
-        <module>mergeresults</module>
-        <module>plancheck</module>
+        <!-- <module>filterresults</module> -->
+        <!-- <module>mergeresults</module> -->
+        <!-- <module>plancheck</module> -->
         <module>table-server</module>
-        <module>graphs-ggl</module>
-        <module>pde</module>
-        <module>synthesis</module>
+        <!-- <module>graphs-ggl</module> -->
+        <!-- <module>pde</module> -->
+        <!-- <module>synthesis</module> -->
     </modules>
 
 </project>
