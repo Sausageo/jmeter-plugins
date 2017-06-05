@@ -126,6 +126,24 @@ public class JSONPathAssertionTest {
     }
 
     @Test
+    public void testGetResult_not_regexp() {
+        System.out.println("not regexp");
+        SampleResult samplerResult = new SampleResult();
+        samplerResult.setResponseData("{\"myval\": \"some complicated value\"}".getBytes());
+
+        JSONPathAssertion instance = new JSONPathAssertion();
+        instance.setJsonPath("$.myval");
+        instance.setJsonValidationBool(true);
+        instance.setExpectedValue("some.+");
+        AssertionResult result = instance.getResult(samplerResult);
+        assertEquals(false, result.isFailure());
+
+        instance.setIsRegex(false);
+        AssertionResult result2 = instance.getResult(samplerResult);
+        assertEquals(true, result2.isFailure());
+    }
+
+    @Test
     public void testGetResult_negative() {
         System.out.println("getResult simple");
         SampleResult samplerResult = new SampleResult();
@@ -333,6 +351,56 @@ public class JSONPathAssertionTest {
         AssertionResult result = instance.getResult(samplerResult);
         assertEquals(expResult.getName(), result.getName());
         assertEquals(true, result.isFailure());
-        assertEquals("Value expected to be '{headerkey=header value}', but found '{\"headerkey\":\"header value\"}'", result.getFailureMessage());
+        assertEquals("Value expected to match regexp '{headerkey=header value}', but it did not match: '{\"headerkey\":\"header value\"}'", result.getFailureMessage());
+    }
+
+    @Test
+    public void testGetResult_match_msg_problem2() {
+        SampleResult samplerResult = new SampleResult();
+        String str = "{\n" +
+                " \"code\":200,\n" +
+                " \"contact\":{\n" +
+                "   \"id\":28071,\n" +
+                "   \"description\":\"test description\",\n" +
+                "   \"info\":{\n" +
+                "       \"ngn_number\":[\n" +
+                "           \"2003\",\n" +
+                "           \"2004\"\n" +
+                "       ]\n" +
+                "   }\n" +
+                " }\n" +
+                "}";
+        samplerResult.setResponseData(str.getBytes());
+
+        JSONPathAssertion instance = new JSONPathAssertion();
+        instance.setJsonPath("$.contact.info.ngn_number");
+        instance.setJsonValidationBool(true);
+        instance.setExpectNull(false);
+        instance.setExpectedValue("[\"2003\",\"2004\"]");
+        instance.setInvert(false);
+        instance.setIsRegex(false);
+        AssertionResult expResult = new AssertionResult("");
+        AssertionResult result = instance.getResult(samplerResult);
+        assertEquals(expResult.getName(), result.getName());
+        assertEquals(false, result.isFailure());
+    }
+
+    @Test
+    public void testGetResultFloat() {
+        System.out.println("testGetResultFloat");
+        SampleResult samplerResult = new SampleResult();
+
+        samplerResult.setResponseData("{\"myval\": [{\"test\":0.0000123456789}]}".getBytes());
+
+        JSONPathAssertion instance = new JSONPathAssertion();
+        instance.setJsonPath("$.myval[*].test");
+        instance.setJsonValidationBool(true);
+        instance.setIsRegex(false);
+        instance.setExpectedValue("0.0000123456789");
+
+        AssertionResult expResult = new AssertionResult("");
+        AssertionResult result = instance.getResult(samplerResult);
+        assertEquals(expResult.getName(), result.getName());
+        assertEquals(false, result.isFailure());
     }
 }

@@ -34,6 +34,7 @@ public class JSONPathAssertion extends AbstractTestElement implements Serializab
     public static final String JSONVALIDATION = "JSONVALIDATION";
     public static final String EXPECT_NULL = "EXPECT_NULL";
     public static final String INVERT = "INVERT";
+    public static final String ISREGEX = "ISREGEX";
 
     public String getJsonPath() {
         return getPropertyAsString(JSONPATH);
@@ -75,23 +76,21 @@ public class JSONPathAssertion extends AbstractTestElement implements Serializab
         return getPropertyAsBoolean(INVERT);
     }
 
+    public void setIsRegex(boolean flag) {
+        setProperty(ISREGEX, flag);
+    }
+
+    public boolean isUseRegex() {
+        return getPropertyAsBoolean(ISREGEX, true);
+    }
+
     private void doAssert(String jsonString) {
         Object value = JsonPath.read(jsonString, getJsonPath());
 
         if (isJsonValidationBool()) {
             if (value instanceof JSONArray) {
-                JSONArray arr = (JSONArray) value;
-
-                if (arr.isEmpty() && getExpectedValue().equals("[]")) {
+                if (arrayMatched((JSONArray) value)) {
                     return;
-                }
-
-                for (Object subj : arr.toArray()) {
-                    if (isExpectNull() && subj == null) {
-                        return;
-                    } else if (isEquals(subj)) {
-                        return;
-                    }
                 }
             } else {
                 if (isExpectNull() && value == null) {
@@ -104,22 +103,48 @@ public class JSONPathAssertion extends AbstractTestElement implements Serializab
             if (isExpectNull()) {
                 throw new RuntimeException(String.format("Value expected to be null, but found '%s'", value));
             } else {
-                throw new RuntimeException(String.format("Value expected to be '%s', but found '%s'", getExpectedValue(), JSONPathExtractor.objectToString(value)));
+                String msg;
+                if (isUseRegex()) {
+                    msg="Value expected to match regexp '%s', but it did not match: '%s'";
+                } else {
+                    msg="Value expected to be '%s', but found '%s'";
+                }
+                throw new RuntimeException(String.format(msg, getExpectedValue(), JSONPathExtractor.objectToString(value)));
             }
         }
     }
 
+    private boolean arrayMatched(JSONArray value) {
+        if (value.isEmpty() && getExpectedValue().equals("[]")) {
+            return true;
+        }
+
+        for (Object subj : value.toArray()) {
+            if (isExpectNull() && subj == null) {
+                return true;
+            } else if (isEquals(subj)) {
+                return true;
+            }
+        }
+
+        return isEquals(value);
+    }
+
     private boolean isEquals(Object subj) {
         String str = JSONPathExtractor.objectToString(subj);
-        Pattern pattern = JMeterUtils.getPatternCache().getPattern(getExpectedValue());
-        return JMeterUtils.getMatcher().matches(str, pattern);
+        if (isUseRegex()) {
+            Pattern pattern = JMeterUtils.getPatternCache().getPattern(getExpectedValue());
+            return JMeterUtils.getMatcher().matches(str, pattern);
+        } else {
+            return str.equals(getExpectedValue());
+        }
     }
 
     @Override
     public AssertionResult getResult(SampleResult samplerResult) {
         AssertionResult result = new AssertionResult(getName());
-        byte[] responseData = samplerResult.getResponseData();
-        if (responseData.length == 0) {
+        String responseData = samplerResult.getResponseDataAsString();
+        if (responseData.isEmpty()) {
             return result.setResultForNull();
         }
 
@@ -128,7 +153,7 @@ public class JSONPathAssertion extends AbstractTestElement implements Serializab
 
         if (!isInvert()) {
             try {
-                doAssert(new String(responseData));
+                doAssert(responseData);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
                     log.debug("Assertion failed", e);
@@ -138,7 +163,7 @@ public class JSONPathAssertion extends AbstractTestElement implements Serializab
             }
         } else {
             try {
-                doAssert(new String(responseData));
+                doAssert(responseData);
                 result.setFailure(true);
                 if (isJsonValidationBool()) {
                     if (isExpectNull())

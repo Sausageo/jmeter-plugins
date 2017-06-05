@@ -2,7 +2,6 @@ package com.blazemeter.jmeter.xmpp;
 
 
 import com.blazemeter.jmeter.xmpp.actions.*;
-import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
@@ -52,7 +51,7 @@ public class JMeterXMPPConnection extends JMeterXMPPConnectionBase {
      *
      * @return XMPPConnection
      */
-    public XMPPConnection getConnection() throws NoSuchAlgorithmException, KeyManagementException, SmackException {
+    public XMPPConnection getConnection() throws NoSuchAlgorithmException, KeyManagementException, SmackException, InterruptedException {
         if (conn == null) {
             String address = getAddress();
             String serv_name = getServiceName();
@@ -78,12 +77,8 @@ public class JMeterXMPPConnection extends JMeterXMPPConnectionBase {
                 newConn = new XMPPTCPConnection(conf);
             }
 
-            if (connectionRegistry.offer(newConn)) {
-                setUpConnection(newConn);
-            } else {
-                JMeterContextService.getContext().getThread().stop();
-                throw new RuntimeException("Development mode limit was reached for parallel threads");
-            }
+            connectionRegistry.put(newConn);
+            setUpConnection(newConn);
         }
 
         return conn;
@@ -92,6 +87,7 @@ public class JMeterXMPPConnection extends JMeterXMPPConnectionBase {
     private void setUpConnection(XMPPConnection newConn) {
         conn = newConn;
         conn.setPacketReplyTimeout(Integer.parseInt(getPacketReplyTimeout()));
+        conn.setFromMode(getFromMode());
 
         if (log.isDebugEnabled()) {
             conn.addConnectionListener(new Loggers.LogConn(conn));

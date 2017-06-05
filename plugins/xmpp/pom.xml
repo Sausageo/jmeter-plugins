@@ -3,9 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
+
     <groupId>kg.apc</groupId>
     <artifactId>jmeter-plugins-xmpp</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
 
     <name>XMPP protocol support</name>
     <description>XMPP protocol support</description>
@@ -30,6 +37,22 @@
         </developer>
     </developers>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>sonatype-nexus-staging</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -51,16 +74,28 @@
             <groupId>org.igniterealtime.smack</groupId>
             <artifactId>smack-bosh</artifactId>
             <version>4.0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.igniterealtime.jbosh</groupId>
+                    <artifactId>jbosh</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.jbosh</groupId>
+            <artifactId>jbosh</artifactId>
+            <version>0.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.igniterealtime.smack</groupId>
             <artifactId>smack-extensions</artifactId>
             <version>4.0.7</version>
         </dependency>
+
         <dependency>
             <groupId>kg.apc</groupId>
             <artifactId>jmeter-plugins-emulators</artifactId>
-            <version>0.2</version>
+            <version>0.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

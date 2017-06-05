@@ -94,13 +94,38 @@ By the number of known users:
                 }
             },
             title: {
-                text: 'Active Installations Over Time: ' + id
+                text: 'Monthly Active Installations: ' + id
             },
             subtitle: {
                 text: 'Source: jmeter-plugins.org'
             },
             xAxis: {
-                type: "datetime"
+                type: "datetime",
+                plotLines: [{
+                    color: 'silver',
+                    dashStyle: 'longdashdot',
+                    value: new Date("2016-11-21"),
+                    width: 1,
+                    label: {
+                        style: {
+                            color: 'silver'
+                        },
+                        text: 'Fixed data collecting',
+                        align: 'left'
+                    }
+                },{
+                    color: 'silver',
+                    dashStyle: 'longdashdot',
+                    value: new Date("2017-05-22"),
+                    width: 1,
+                    label: {
+                        style: {
+                            color: 'silver'
+                        },
+                        text: 'Changed installID format',
+                        align: 'left'
+                    }
+                }]
             },
             yAxis: {
                 title: {
@@ -132,19 +157,29 @@ By the number of known users:
         };
     }
 
-    function plugin_vers_graph(id, data) {
+    function plugin_vers_graph(id, data, repo_entry) {
         var series = [];
         var sum = values(data).reduce(function (a, b) {
             return a + b;
         }, 0);
 
         var keys = Object.keys(data);
+        var repo_keys = Object.keys(repo_entry.versions);
         keys.sort();
 
+        var other = 0;
         for (var n = 0; n < keys.length; n++) {
             var ver = keys[n];
             var val = Math.round(1000 * data[ver] / sum) / 10;
-            series.push(['v ' + ver, val]);
+            if ($.inArray(ver, repo_keys) >= 0) {
+                series.push(['v ' + ver, val]);
+            } else {
+                other += val;
+            }
+        }
+
+        if (other) {
+            series.push(['N/A', other]);
         }
 
         return {
@@ -213,6 +248,10 @@ By the number of known users:
                     var list = [];
                     for (var k in json) {
                         if (k.startsWith('jmeter-')) continue;
+                        if (!repo[k]) {
+                            console.warn("No such entry in repo: " + k);
+                            continue;
+                        }
 
                         var values2 = values(json[k]);
                         var plugin = {
@@ -246,7 +285,7 @@ By the number of known users:
                             var item = $(this).data("plugin");
 
                             $('#pluginhist').highcharts(plugin_hist_graph(item.plugin, item.data, pmgr.data));
-                            $('#pluginvers').highcharts(plugin_vers_graph(item.plugin, item.vers));
+                            $('#pluginvers').highcharts(plugin_vers_graph(item.plugin, item.vers, repo[item.plugin]));
                         });
 
                         var li = $("<li></li>");

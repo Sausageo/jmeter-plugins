@@ -27,11 +27,11 @@
         <module>csvars</module>
         <module>dbmon</module>
         <module>deprecated</module>
+        <module>directory-listing</module>
         <module>dummy</module>
         <module>ffw</module>
         <module>fifo</module>
         <module>functions</module>
-        <module>hadoop</module>
         <module>httpraw</module>
         <module>jms</module>
         <module>jmxmon</module>
@@ -41,6 +41,7 @@
         <module>perfmon</module>
         <module>prmctl</module>
         <module>redis</module>
+        <module>rotating-listener</module>
         <module>sense-uploader</module>
         <module>tst</module>
         <module>udp</module>

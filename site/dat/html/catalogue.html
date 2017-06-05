@@ -38,7 +38,7 @@
         if (!url) url = window.location.href;
         name = name.replace(/[\[\]]/g, "\\$&");
         var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                results = regex.exec(url);
+            results = regex.exec(url);
         if (!results) return null;
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
@@ -53,6 +53,9 @@
         function getSparkline(plugin) {
             var pluginSpark = $("<div></div>").addClass("sparkline-container");
             var vals = values(stats[plugin.id]);
+            while (vals.length>30) {
+                vals.shift();
+            }
             var span = $("<span></span>").addClass("sparkline").text(vals);
             pluginSpark.append(span);
             pluginSpark.append("<br/>");
@@ -70,6 +73,9 @@
                 var vers = $("<p><i class='fa fa-download'></i> Download Versions: </p>").addClass('small');
                 for (var n = 0; n < vers_list.length; n++) {
                     var ver_link = $('<a href="/files/packages/' + plugin.id + '-' + vers_list[n] + '.zip">' + vers_list[n] + "</a>");
+                    if (plugin.versions[vers_list[n]]['changes']) {
+                        ver_link.attr('title', 'Changes: ' + plugin.versions[vers_list[n]]['changes']);
+                    }
                     vers.append(ver_link);
                     if (n < vers_list.length - 1) {
                         vers.append(", ")
@@ -78,10 +84,6 @@
                 left.append("<br/>");
                 left.append(vers);
             }
-
-
-            // TODO: give download links
-            // TODO: list dependencies
 
             var mid = $("<div></div>").addClass("pull-left col-md-3 text-center");
             if (plugin.screenshotUrl) {
@@ -160,9 +162,9 @@
                 typingTimer = setTimeout(refreshCatalogue, doneTypingInterval);
             }).on('keydown', function () {
                 clearTimeout(typingTimer);
-            }).change(refreshCatalogue);
+            });//.change(refreshCatalogue);
 
-            data.sort(function (a, b) {
+            data.sort(function () {
                 return Math.random() > 0.5 ? 1 : -1;
             });
 
