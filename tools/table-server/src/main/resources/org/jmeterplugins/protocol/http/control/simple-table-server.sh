@@ -27,7 +27,6 @@
 cd `dirname $0`
 arg1=$1
 
-CP=../lib/ext/ApacheJMeter_core.jar:../lib/jorphan.jar:../lib/ext/jmeter-plugins-table-server-${version}.jar
-CP=${CP}:../lib/logkit-2.0.jar:../lib/avalon-framework-4.1.4.jar
+CP=${CP}:../lib/sts/logkit-2.0.jar:../lib/sts/avalon-framework-4.1.4.jar
 
 java -cp $CP -DjmeterPlugin.sts.datasetDirectory={STS_DATASET_DIRECTORY} org.jmeterplugins.protocol.http.control.HttpSimpleTableServer $arg1
