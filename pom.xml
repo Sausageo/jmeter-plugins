@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <modules>
         <!-- <module>infra</module> -->
-        <!-- <module>plugins</module> -->
+        <module>plugins</module>
         <module>tools</module>
         <!-- <module>graphs</module> -->
     </modules>

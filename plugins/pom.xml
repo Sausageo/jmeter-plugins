@@ -21,7 +21,7 @@
     -->
 
     <modules>
-        <module>autostop</module>
+        <!-- <module>autostop</module>
         <module>casutg</module>
         <module>csl</module>
         <module>csvars</module>
@@ -44,10 +44,10 @@
         <module>rotating-listener</module>
         <module>sense-uploader</module>
         <module>tst</module>
-        <module>udp</module>
+        <module>udp</module> -->
         <module>webdriver</module>
-        <module>wsc</module>
+        <!-- <module>wsc</module>
         <module>xml</module>
-        <module>xmpp</module>
+        <module>xmpp</module> -->
     </modules>
 </project>

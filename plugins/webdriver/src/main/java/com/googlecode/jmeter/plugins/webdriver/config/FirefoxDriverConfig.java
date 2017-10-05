@@ -37,12 +37,12 @@ public class FirefoxDriverConfig extends WebDriverConfig<FirefoxDriver> {
     FirefoxProfile createProfile() {
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("app.update.enabled", false);
-        
+
         String userAgentOverride = getUserAgentOverride();
         if (StringUtils.isNotEmpty(userAgentOverride)) {
             profile.setPreference("general.useragent.override", userAgentOverride);
         }
-        
+
         String ntlmOverride = getNtlmSetting();
         if (StringUtils.isNotEmpty(ntlmOverride)) {
             profile.setPreference("network.negotiate-auth.allow-insecure-ntlm-v1", true);
@@ -65,7 +65,7 @@ public class FirefoxDriverConfig extends WebDriverConfig<FirefoxDriver> {
             String filename = ((JMeterProperty) row.get(0)).getStringValue();
             try {
                 profile.addExtension(new File(filename));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("Failed to add extension " + filename, e);
             }
         }
